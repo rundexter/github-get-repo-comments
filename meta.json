@@ -4,23 +4,54 @@
 {
     //Required. Inputs the module expects.
     "inputs": [
-        //e.g.
-        /*
         {
-            "id": "from",
-            "title":"From"
+            "id": "owner",
+            "title":"Owner"
+        },
+        {
+            "id": "repo",
+            "title":"Repo"
+        },
+        {
+            "id": "sort",
+            "title":"Sort"
+        },
+        {
+            "id": "direction",
+            "title":"Direction"
+        },
+        {
+            "id": "since",
+            "title":"Since"
         }
-        */
     ],
     //Required. Outputs the module emits.
     "outputs": [
-      //e.g.
-      /*
         {
-            "id": "from",
-            "title":"From"
+            "id": "commit_id",
+            "title":"Commit id"
+        },
+        {
+          "id": "user",
+          "title":"User Info"
+        },
+        {
+          "id": "body",
+          "title":"Body"
+        },
+        {
+          "id": "created_at",
+          "title":"Created at"
+        },
+        {
+          "id": "html_url",
+          "title":"HTML URL"
+        },
+        {
+          "id": "pull_request_url",
+          "title":"Pull request url"
         }
-      */
     ],
-    "title": "GitHub Get Comments (Repo)" /* Required.A display name for the module */
+    /* Required.A display name for the module */
+    "title": "GitHub Get Comments (Repo)"
 }
