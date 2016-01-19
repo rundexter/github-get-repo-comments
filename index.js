@@ -11,15 +11,10 @@ var pickInputs = {
         'since': 'since'
     },
     pickOutputs = {
-        '-': {
-            key: 'data',
-            fields: {
-                'user': 'user.login',
-                'body': 'body',
-                'created_at': 'created_at',
-                'html_url': 'html_url'
-            }
-        }
+        'user': { key: 'data', fields: ['user.login'] },
+        'body': { key: 'data', fields: ['body'] },
+        'created_at': { key: 'data', fields: ['created_at'] },
+        'html_url': { key: 'data', fields: ['html_url'] }
     };
 
 module.exports = {
@@ -44,7 +39,7 @@ module.exports = {
         });
 
         github.issues.repoComments(inputs, function (error, dataInfo) {
-            console.log(dataInfo);
+
             error ? this.fail(error) : this.complete(util.pickOutputs({ data: dataInfo }, pickOutputs));
         }.bind(this));
     }
