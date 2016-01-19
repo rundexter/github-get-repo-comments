@@ -28,10 +28,6 @@
     //Required. Outputs the module emits.
     "outputs": [
         {
-            "id": "commit_id",
-            "title":"Commit id"
-        },
-        {
           "id": "user",
           "title":"User Info"
         },
@@ -46,12 +42,11 @@
         {
           "id": "html_url",
           "title":"HTML URL"
-        },
-        {
-          "id": "pull_request_url",
-          "title":"Pull request url"
         }
     ],
+    "providers": [{
+        "name": "github"
+    }],
     "icon": "github",
     /* Required.A display name for the module */
     "title": "GitHub Get Comments (Repo)"

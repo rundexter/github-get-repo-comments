@@ -1,65 +1,28 @@
-var GitHubApi = require("github");
-var _ = require('lodash');
+var _ = require('lodash'),
+    util = require('./util.js'),
+    GitHubApi = require("github"),
+    github = new GitHubApi({ version: '3.0.0' });
 
-var pickResultData = [
-    'commit_id',
-    'user.login',
-    'body',
-    'created_at',
-    'html_url',
-    'pull_request_url'
-];
-
-
-
-
-
+var pickInputs = {
+        'owner': { key: 'user', validate: { req: true }},
+        'repo': { key: 'repo', validate: { req: true }},
+        'sort': 'sort',
+        'direction': 'direction',
+        'since': 'since'
+    },
+    pickOutputs = {
+        '-': {
+            key: 'data',
+            fields: {
+                'user': 'user.login',
+                'body': 'body',
+                'created_at': 'created_at',
+                'html_url': 'html_url'
+            }
+        }
+    };
 
 module.exports = {
-    /**
-     * Pick API result.
-     *
-     * @param inputs
-     * @returns {Array}
-     */
-    pickResultData: function (inputs) {
-        var result = [];
-
-        _.map(inputs, function (input) {
-            var tmpResults = {};
-
-            pickResultData.forEach(function (dataKey) {
-                if (!_.isUndefined(_.get(input, dataKey, undefined))) {
-
-                    _.set(tmpResults, dataKey, _.get(input, dataKey));
-                }
-            });
-            result.push(tmpResults);
-        });
-
-        return result;
-    },
-
-    /**
-     * Authenticate gitHub user.
-     *
-     * @param dexter
-     * @param github
-     */
-    gitHubAuthenticate: function (dexter, github) {
-
-        if (dexter.environment('GitHubUserName') && dexter.environment('GitHubPassword')) {
-
-            github.authenticate({
-                type: dexter.environment('GitHubType') || "basic",
-                username: dexter.environment('GitHubUserName'),
-                password: dexter.environment('GitHubPassword')
-            });
-        } else {
-            this.fail('A GitHubUserName and GitHubPassword environment variable is required for this module');
-        }
-    },
-
     /**
      * The main entry point for the Dexter module
      *
@@ -67,23 +30,22 @@ module.exports = {
      * @param {AppData} dexter Container for all data used in this workflow.
      */
     run: function(step, dexter) {
+        var credentials = dexter.provider('github').credentials(),
+            inputs = util.pickInputs(step, pickInputs),
+            validateErrors = util.checkValidateErrors(inputs, pickInputs);
 
-        var github = new GitHubApi({
-            // required 
-            version: "3.0.0"
+        // check params.
+        if (validateErrors)
+            return this.fail(validateErrors);
+
+        github.authenticate({
+            type: 'oauth',
+            token: _.get(credentials, 'access_token')
         });
 
-        this.gitHubAuthenticate(dexter, github);
-
-        if (!step.input('owner').first() || !step.input('repo').first()) {
-
-            this.fail('A owner and repo need for this module');
-        } else {
-
-            github.issues.repoComments(_.merge({user: step.input('owner').first()}, _.omit(step.inputs(), ['owner'])), function (err, comments) {
-
-                err ? this.fail(err) : this.complete(this.pickResultData(comments));
-            }.bind(this));
-        }
+        github.issues.repoComments(inputs, function (error, dataInfo) {
+            console.log(dataInfo);
+            error ? this.fail(error) : this.complete(util.pickOutputs({ data: dataInfo }, pickOutputs));
+        }.bind(this));
     }
 };
